@@ -3,6 +3,7 @@ Name:
 ID:
 Assignment:
 *******************/
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -11,6 +12,8 @@ void task2HumanPyramid();
 void task3ParenthesisValidator();
 void task4QueensBattle();
 void task5CrosswordGenerator();
+
+#define pyramidSize 5
 
 int main()
 {
@@ -60,14 +63,69 @@ int main()
     } while (task != 6);
 }
 
+int getPaths(int column, int row) {
+    if (row == 0 || column == 0)
+        return 1;
+    return getPaths(column, row - 1) + getPaths(column - 1, row);
+}
+
 void task1RobotPaths()
 {
-    // Todo
+    int column, row, paths = 0;
+    printf("Please enter the coordinates of the robot (column, row):\n");
+    scanf("%d %d:", &column, &row);
+    if (column >= 0 && row >= 0)
+        paths = getPaths(column, row);
+    printf("The total number of paths the robot can take to reach home is: %d\n", paths);
+}
+
+
+void setPyramid(float pyramid[][pyramidSize], int pyramidArraySize) {
+    for (int y = pyramidArraySize - 1; y >= 0 ; y--)
+        for (int x = pyramidArraySize - 1; x >= y; x--)
+            scanf("%f", &pyramid[x][y]);
+}
+
+void printPyramidTemp(float pyramid[][pyramidSize], int pyramidArraySize) {
+    for (int y = pyramidArraySize - 1; y >= 0 ; y--) {
+        printf("%d  ", y);
+        for (int x = pyramidArraySize - 1; x >= y; x--)
+            printf("%.2f ", pyramid[x][y]);
+        printf("\n");
+        printf("   ", y);
+        for (int x = pyramidArraySize - 1; x >= y; x--)
+            printf("  %d   ", x);
+        printf("\n");
+    }
+}
+
+float getPyramidWeight(float pyramid[][pyramidSize], int pyramidArraySize, int x, int y) {
+    if (x == pyramidArraySize - 1 && y == pyramidArraySize - 1)
+        return pyramid[x][y];
+    if (x == pyramidArraySize - 1)
+        return getPyramidWeight(pyramid, pyramidArraySize, x, y + 1) / 2 + pyramid[x][y];
+    if (x == y)
+        return getPyramidWeight(pyramid, pyramidArraySize, x + 1, y + 1) / 2 + pyramid[x][y];
+    return getPyramidWeight(pyramid, pyramidArraySize, x + 1, y + 1) / 2
+           + getPyramidWeight(pyramid, pyramidArraySize, x, y + 1) / 2
+           + pyramid[x][y];
+}
+
+void printPyramid(float pyramid[][pyramidSize], int pyramidArraySize) {
+    for (int y = pyramidArraySize - 1; y >= 0 ; y--)
+    {
+        for (int x = pyramidArraySize - 1; x >= y; x--)
+            printf("%.2f ", getPyramidWeight(pyramid, pyramidArraySize, x, y));
+        printf("\n");
+    }
 }
 
 void task2HumanPyramid()
 {
-    // Todo
+    float pyramid[pyramidSize][pyramidSize];
+    printf("Please enter the weights of the cheerleaders:\n");
+    setPyramid(pyramid, pyramidSize);
+    printPyramid(pyramid, pyramidSize);
 }
 
 void task3ParenthesisValidator()
