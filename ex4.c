@@ -63,6 +63,8 @@ int main()
     } while (task != 6);
 }
 
+/************************************************************************************************/
+
 int getPaths(int column, int row) {
     if (row == 0 || column == 0)
         return 1;
@@ -79,24 +81,12 @@ void task1RobotPaths()
     printf("The total number of paths the robot can take to reach home is: %d\n", paths);
 }
 
+/************************************************************************************************/
 
 void setPyramid(float pyramid[][pyramidSize], int pyramidArraySize) {
     for (int y = pyramidArraySize - 1; y >= 0 ; y--)
         for (int x = pyramidArraySize - 1; x >= y; x--)
             scanf("%f", &pyramid[x][y]);
-}
-
-void printPyramidTemp(float pyramid[][pyramidSize], int pyramidArraySize) {
-    for (int y = pyramidArraySize - 1; y >= 0 ; y--) {
-        printf("%d  ", y);
-        for (int x = pyramidArraySize - 1; x >= y; x--)
-            printf("%.2f ", pyramid[x][y]);
-        printf("\n");
-        printf("   ", y);
-        for (int x = pyramidArraySize - 1; x >= y; x--)
-            printf("  %d   ", x);
-        printf("\n");
-    }
 }
 
 float getPyramidWeight(float pyramid[][pyramidSize], int pyramidArraySize, int x, int y) {
@@ -128,15 +118,63 @@ void task2HumanPyramid()
     printPyramid(pyramid, pyramidSize);
 }
 
+/************************************************************************************************/
+
+char getMatchingCloseParenthesis(char open) {
+    if (open == '(')
+        return ')';
+    if (open == '{')
+        return '}';
+    if (open == '[')
+        return ']';
+    if (open == '<')
+        return '>';
+}
+
+void clearBuffer(void) {
+    char dummy;
+    while (scanf("%c", &dummy) == 1 && dummy != '\n');
+}
+
+int validateParenthesis(char finishChar) {
+    char currentChar;
+    if (scanf("%c", &currentChar) <= 0)
+        return -1;
+    if (currentChar == finishChar)
+        return 0;
+    if (currentChar == '(' || currentChar == '{' || currentChar == '[' || currentChar == '<') {
+        if (validateParenthesis(getMatchingCloseParenthesis(currentChar)) == 0)
+            return validateParenthesis(finishChar);
+        return -1;
+    }
+    if (currentChar == ')' || currentChar == '}' || currentChar == ']' || currentChar == '>') {
+        clearBuffer();
+        return -1;
+    }
+    if (currentChar == '\n') {
+        return -1;
+    }
+    return validateParenthesis(finishChar);
+}
+
 void task3ParenthesisValidator()
 {
-    // Todo
+    clearBuffer();
+    printf("Please enter a term for validation:\n");
+    if (validateParenthesis('\n') == 0)
+        printf("The parentheses are balanced correctly.\n");
+    else
+        printf("The parentheses are not balanced correctly.\n");
 }
+
+/************************************************************************************************/
 
 void task4QueensBattle()
 {
     // Todo
 }
+
+/************************************************************************************************/
 
 void task5CrosswordGenerator()
 {
