@@ -14,6 +14,7 @@ void task4QueensBattle();
 void task5CrosswordGenerator();
 
 #define pyramidSize 5
+#define maxBoardSize 20
 
 int main()
 {
@@ -129,6 +130,7 @@ char getMatchingCloseParenthesis(char open) {
         return ']';
     if (open == '<')
         return '>';
+    return ' ';
 }
 
 void clearBuffer(void) {
@@ -169,9 +171,88 @@ void task3ParenthesisValidator()
 
 /************************************************************************************************/
 
+void initBoard(char boardAreas[][maxBoardSize], int boardSize, char initChar) {
+    for (int row = 0; row < boardSize; row++)
+        for (int column = 0; column < boardSize; column++)
+            boardAreas[row][column] = initChar;
+}
+
+void getAreas(char boardAreas[][maxBoardSize], int boardSize) {
+    clearBuffer();
+    printf("Please enter the %d*%d puzzle board\n", boardSize, boardSize);
+    for (int row = 0; row < boardSize; row++)
+        for (int column = 0; column < boardSize; column++)
+            scanf(" %c", &boardAreas[row][column]);
+}
+
+void printBoard(char board[][maxBoardSize], int boardSize) {
+    for (int row = 0; row < boardSize; row++) {
+        for (int column = 0; column < boardSize; column++)
+            printf("%c ", board[row][column]);
+        printf("\n");
+    }
+    printf("\n");
+}
+
+int checkQueenPosition(char board[][maxBoardSize], char areas[][maxBoardSize], int boardSize, int row, int column) {
+    int i, j;
+
+    // check row
+    for (i = 0; i < boardSize; i++)
+        if (i != row && board[i][column] == 'X')
+            return 0;
+
+    // check column
+    for (i = 0; i < boardSize; i++)
+        if (i != column && board[row][i] == 'X')
+            return 0;
+
+    // check adjacent
+    for (i = row - 1; i <= row + 1; i++)
+        for (j = column - 1; j <= column + 1; j++)
+            if ((i != row || j != column) && board[i][j] == 'X')
+                return 0;
+
+    // check area
+    for (i = 0; i < boardSize; i++)
+        for (j = 0; j < boardSize; j++)
+            if (areas[i][j] == areas[row][column] && board[i][j] == 'X')
+                return 0;
+
+    return 1;
+}
+
+int placeQueens(char board[][maxBoardSize], char areas[][maxBoardSize], int boardSize, int row, int column) {
+    if (row == boardSize)
+        return 1;
+
+    if (column == boardSize)
+        return 0;
+
+    if (checkQueenPosition(board, areas, boardSize, row, column) == 1) {
+        board[row][column] = 'X';
+        if (placeQueens(board, areas, boardSize, row + 1, 0)) {
+            return 1;
+        }
+        board[row][column] = '*';
+    }
+    return placeQueens(board, areas, boardSize, row, column + 1);
+}
+
 void task4QueensBattle()
 {
-    // Todo
+    char board[maxBoardSize][maxBoardSize] = {0}, areas[maxBoardSize][maxBoardSize] = {0};
+    int boardSize = 0;
+    printf("Please enter the board dimensions:\n");
+    scanf("%d", &boardSize);
+    initBoard(board, boardSize, '*');
+    getAreas(areas, boardSize);
+    if (placeQueens(board, areas, boardSize, 0, 0) == 0)
+        printf("This puzzle cannot be solved.\n");
+    else {
+        printf("Solution:\n");
+        printBoard(board, boardSize);
+    }
 }
 
 /************************************************************************************************/
