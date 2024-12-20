@@ -13,14 +13,6 @@ void task3ParenthesisValidator();
 void task4QueensBattle();
 void task5CrosswordGenerator();
 
-#define pyramidSize 5
-#define maxBoardSize 20
-#define maxGridSize 30
-#define maxSlots 100
-#define slotLocationSize 3
-#define maxDictionary 100
-#define maxWord 15
-
 int main()
 {
     int task = -1;
@@ -88,6 +80,9 @@ void task1RobotPaths()
 }
 
 /************************************************************************************************/
+
+#define pyramidSize 5
+
 
 void setPyramid(float pyramid[][pyramidSize], int pyramidArraySize) {
     for (int y = pyramidArraySize - 1; y >= 0 ; y--)
@@ -176,6 +171,9 @@ void task3ParenthesisValidator()
 
 /************************************************************************************************/
 
+#define maxBoardSize 20
+
+
 void initBoard(char boardAreas[][maxBoardSize], int boardSize, char initChar) {
     for (int row = 0; row < boardSize; row++)
         for (int column = 0; column < boardSize; column++)
@@ -262,6 +260,16 @@ void task4QueensBattle()
 
 /************************************************************************************************/
 
+#define maxGridSize 30
+#define maxSlots 100
+#define slotLocationSize 3
+#define maxDictionary 100
+#define maxWord (15 + 1)
+#define slotsIndexForYPosition 0
+#define slotsIndexForXPosition 1
+#define slotsIndexForLength 2
+
+
 void initSlotsLocationsArray(int array[][slotLocationSize], int arraySize) {
     for (int row = 0; row < arraySize; row++)
         for (int column = 0; column < slotLocationSize; column++)
@@ -295,27 +303,24 @@ int isValidSlotData(int Y, int X, int length, char orientation, int gridSize) {
     return 1;
 }
 
-void getSlotsData(int locationsArray[][slotLocationSize], char orientationArray[], int arraySize, int gridSize) {
-#define yPosision 0
-#define xPosition 1
-#define length 2
+void getSlotsData(int locations[][slotLocationSize], char orientations[], int arraySize, int gridSize) {
     clearBuffer();
     printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
     for (int row = 0; row < arraySize; row++) {
         // for (int column = 0; column < slotLocationSize; column++)
         //     scanf("%d ", &locationsArray[row][column]);
-        scanf("%d ", &locationsArray[row][yPosision]);
-        scanf("%d ", &locationsArray[row][xPosition]);
-        scanf("%d ", &locationsArray[row][length]);
-        scanf("%[^\n]c", &orientationArray[row]);
-        while (isValidSlotData(locationsArray[row][yPosision], locationsArray[row][xPosition],
-                               locationsArray[row][length], orientationArray[row], gridSize) == 0) {
+        scanf("%d ", &locations[row][slotsIndexForYPosition]);
+        scanf("%d ", &locations[row][slotsIndexForXPosition]);
+        scanf("%d ", &locations[row][slotsIndexForLength]);
+        scanf("%[^\n]c", &orientations[row]);
+        while (isValidSlotData(locations[row][slotsIndexForYPosition], locations[row][slotsIndexForXPosition],
+                               locations[row][slotsIndexForLength], orientations[row], gridSize) == 0) {
             printf("This combination is not valid. ");
             printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
-            scanf("%d ", &locationsArray[row][yPosision]);
-            scanf("%d ", &locationsArray[row][xPosition]);
-            scanf("%d ", &locationsArray[row][length]);
-            scanf("%[^\n]c", &orientationArray[row]);
+            scanf("%d ", &locations[row][slotsIndexForYPosition]);
+            scanf("%d ", &locations[row][slotsIndexForXPosition]);
+            scanf("%d ", &locations[row][slotsIndexForLength]);
+            scanf("%[^\n]c", &orientations[row]);
         }
     }
 }
@@ -337,22 +342,58 @@ void loadDictionary(char dictionary[][maxWord], int dictionarySize, int maxWordL
         scanf("%s", dictionary[row]);
 }
 
+void initCrossword(char crossword[][maxWord], int slots[][slotLocationSize], int slotsNum) {
+    for (int slot = 0; slot < slotsNum; slot++){
+        for (int i = 0; i < slots[slot][slotsIndexForLength]; i++)
+            crossword[slot][i] = ' ';
+        crossword[slot][slots[slot][slotsIndexForLength]] = '\0';
+    }
+}
+
+void tempPrintCrossword(char crossword[][maxWord], int slotsNum) {
+    for (int slot = 0; slot < slotsNum; slot++)
+        printf("%s|\n", crossword[slot]);
+}
+
+void printGrid(int gridSize, int slots[][slotLocationSize], char slotsOrientations[], char crossword[][maxWord], int slotsNum) {
+    char grid[gridSize][gridSize];
+    for (int row = 0; row < gridSize; row++)
+        for (int column = 0; column < gridSize; column++)
+            grid[row][column] = '#';
+    for (int slot = 0; slot < slotsNum; slot++) {
+        for (int i = 0; i < slots[slot][slotsIndexForLength]; i++) {
+            if (slotsOrientations[slot] == 'H')
+                grid[slots[slot][slotsIndexForXPosition] + i][slots[slot][slotsIndexForYPosition]] = crossword[slot][i];
+            else // (slotsOrientations[slot] == 'V')
+                grid[slots[slot][slotsIndexForXPosition]][slots[slot][slotsIndexForYPosition] + i] = crossword[slot][i];
+        }
+    }
+    for (int row = 0; row < gridSize; row++) {
+        for (int column = 0; column < gridSize; column++)
+            printf("| %c ", grid[column][row]);
+        printf(" |\n");
+    }
+
+}
+
 void task5CrosswordGenerator()
 {
-    int gridSize = 0, slots = 0, slotsLocationsAndSizes[maxSlots][3], dictionarySize;
-    char slotsOrientation[maxSlots], dictionary[maxDictionary][maxWord], crossword[maxSlots][maxWord];
+    int gridSize = 0, slotsNum = 0, slots[maxSlots][slotLocationSize], dictionarySize;
+    char slotsOrientations[maxSlots], dictionary[maxDictionary][maxWord], crossword[maxSlots][maxWord];
     printf("Please enter the dimensions of the crossword grid:\n");
     scanf("%d", &gridSize);
     printf("Please enter the number of slots in the crossword:\n");
-    scanf("%d", &slots);
-    initSlotsLocationsArray(slotsLocationsAndSizes, slots);
-    initSlotsOrientation(slotsOrientation, slots);
-    tempPrintSlotsLocations(slotsLocationsAndSizes, slotsOrientation, slots);
-    getSlotsData(slotsLocationsAndSizes, slotsOrientation, slots, gridSize);
-    tempPrintSlotsLocations(slotsLocationsAndSizes, slotsOrientation, slots);
-    dictionarySize = getDictionarySize(slots);
+    scanf("%d", &slotsNum);
+    initSlotsLocationsArray(slots, slotsNum);
+    initSlotsOrientation(slotsOrientations, slotsNum);
+    tempPrintSlotsLocations(slots, slotsOrientations, slotsNum);
+    getSlotsData(slots, slotsOrientations, slotsNum, gridSize);
+    tempPrintSlotsLocations(slots, slotsOrientations, slotsNum);
+    dictionarySize = getDictionarySize(slotsNum);
     loadDictionary(dictionary, dictionarySize, maxWord);
     tempPrintDict(dictionary, dictionarySize);
-
+    initCrossword(crossword, slots, slotsNum);
+    tempPrintCrossword(crossword, slotsNum);
+    printGrid(gridSize, slots, slotsOrientations, crossword, slotsNum);
     // Todo
 }
