@@ -68,7 +68,7 @@ int main()
 
 int getPaths(int column, int row) {
     if (row == 0 || column == 0)
-        return success;
+        return 1;
     return getPaths(column, row - 1) + getPaths(column - 1, row);
 }
 
@@ -126,6 +126,7 @@ void task2HumanPyramid()
     printf("Please enter the weights of the cheerleaders:\n");
     if (setPyramid(pyramid, pyramidSize) == fail)
         return;
+    printf("The total weight on each cheerleader is:\n");
     printPyramid(pyramid, pyramidSize);
 }
 
@@ -171,7 +172,7 @@ int validateParenthesis(char finishChar) {
 
 void task3ParenthesisValidator()
 {
-    clearBuffer();
+    // clearBuffer();
     printf("Please enter a term for validation:\n");
     if (validateParenthesis('\n') == success)
         printf("The parentheses are balanced correctly.\n");
@@ -192,7 +193,7 @@ void initBoard(char boardAreas[][maxBoardSize], int boardSize, char initChar) {
 
 void getAreas(char boardAreas[][maxBoardSize], int boardSize) {
     clearBuffer();
-    printf("Please enter the %d*%d puzzle board\n", boardSize, boardSize);
+    printf("Please enter a %d*%d puzzle board:\n", boardSize, boardSize);
     for (int row = 0; row < boardSize; row++)
         for (int column = 0; column < boardSize; column++)
             scanf(" %c", &boardAreas[row][column]);
@@ -204,7 +205,6 @@ void printBoard(char board[][maxBoardSize], int boardSize) {
             printf("%c ", board[row][column]);
         printf("\n");
     }
-    printf("\n");
 }
 
 int checkQueenPosition(char board[][maxBoardSize], char areas[][maxBoardSize], int boardSize, int row, int column) {
@@ -242,7 +242,7 @@ int placeQueens(char board[][maxBoardSize], char areas[][maxBoardSize], int boar
     if (column == boardSize)
         return fail;
 
-    if (checkQueenPosition(board, areas, boardSize, row, column) == 1) {
+    if (checkQueenPosition(board, areas, boardSize, row, column) == success) {
         board[row][column] = 'X';
         if (placeQueens(board, areas, boardSize, row + 1, 0)) {
             return success;
@@ -260,7 +260,7 @@ void task4QueensBattle()
     scanf("%d", &boardSize);
     initBoard(board, boardSize, '*');
     getAreas(areas, boardSize);
-    if (placeQueens(board, areas, boardSize, 0, 0) == 0)
+    if (placeQueens(board, areas, boardSize, 0, 0) == fail)
         printf("This puzzle cannot be solved.\n");
     else {
         printf("Solution:\n");
@@ -324,7 +324,7 @@ void getSlotsData(int locations[][slotLocationSize], char orientations[], int ar
         scanf("%d ", &locations[row][slotsIndexForLength]);
         scanf("%[^\n]c", &orientations[row]);
         while (isValidSlotData(locations[row][slotsIndexForYPosition], locations[row][slotsIndexForXPosition],
-                               locations[row][slotsIndexForLength], orientations[row], gridSize) == 0) {
+                               locations[row][slotsIndexForLength], orientations[row], gridSize) == fail) {
             printf("This combination is not valid. ");
             printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
             scanf("%d ", &locations[row][slotsIndexForYPosition]);
@@ -385,13 +385,18 @@ void printGrid(int gridSize, int slots[][slotLocationSize], char slotsOrientatio
     }
 }
 
-int embedWordInCrossword(char crossword[][maxWord], int slots[][slotLocationSize], char slotsOrientations[], int slotsNum, char dictionary[][maxWord], int dictionarySize, int slot) {
-    if (slot > slotsNum)
+int embedWordInCrossword(char crossword[][maxWord], int slots[][slotLocationSize], char slotsOrientations[], int slotsNum, char dictionary[][maxWord], int dictionarySize, int slot, int dictIdx) {
+    if (slot == slotsNum)
         return success;
+
+    if (dictIdx == dictionarySize)
+        return fail;
+
+    // if (checkWord() == success)
 }
 
 int solveCrossword(char crossword[][maxWord], int slots[][slotLocationSize], char slotsOrientations[], int slotsNum, char dictionary[][maxWord], int dictionarySize) {
-    if (embedWordInCrossword(crossword, slots, slotsOrientations, slotsNum, dictionary, dictionarySize, 0) == 1)
+    if (embedWordInCrossword(crossword, slots, slotsOrientations, slotsNum, dictionary, dictionarySize, 0, 0) == success)
         return success;
     return fail;
 }
@@ -415,7 +420,7 @@ void task5CrosswordGenerator()
     initCrossword(crossword, slots, slotsNum);
     tempPrintCrossword(crossword, slotsNum);
     printGrid(gridSize, slots, slotsOrientations, crossword, slotsNum);
-    if (solveCrossword(crossword, slots, slotsOrientations, slotsNum, dictionary, dictionarySize) == 1)
+    if (solveCrossword(crossword, slots, slotsOrientations, slotsNum, dictionary, dictionarySize) == success)
         printGrid(gridSize, slots, slotsOrientations, crossword, slotsNum);
     else
         printf("This crossword cannot be solved.\n");
