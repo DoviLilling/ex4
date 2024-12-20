@@ -304,6 +304,19 @@ int getDictionarySize(int minSize) {
     return dictionarySize;
 }
 
+void loadDictionary(char dictionary[][maxWord], int dictionarySize, int maxWordLength) {
+    printf("Please enter the words for the dictionary:\n");
+    for (int row = 0; row < dictionarySize; row++)
+        scanf("%s", dictionary[row]);
+}
+
+void tempPrintDict(char dictionary[][maxWord], int dictionarySize) {
+    printf("\nDict:\n");
+    for (int row = 0; row < dictionarySize; row++)
+        printf("%s\n", dictionary[row]);
+    printf("\n");
+}
+
 void task5CrosswordGenerator()
 {
     int gridSize = 0, slots = 0, slotsLocationsAndSizes[maxSlots][3], dictionarySize, words;
@@ -318,7 +331,8 @@ void task5CrosswordGenerator()
     getSlotsData(slotsLocationsAndSizes, slotsOrientation, slots);
     tempPrintSlotsLocations(slotsLocationsAndSizes, slotsOrientation, slots);
     dictionarySize = getDictionarySize(slots);
-    // getDictionary(dictionary, dictionarySize, maxWord);
+    loadDictionary(dictionary, dictionarySize, maxWord);
+    tempPrintDict(dictionary, dictionarySize);
 
     // Todo
 }
