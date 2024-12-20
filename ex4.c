@@ -13,6 +13,9 @@ void task3ParenthesisValidator();
 void task4QueensBattle();
 void task5CrosswordGenerator();
 
+#define success 1
+#define fail 0
+
 int main()
 {
     int task = -1;
@@ -65,7 +68,7 @@ int main()
 
 int getPaths(int column, int row) {
     if (row == 0 || column == 0)
-        return 1;
+        return success;
     return getPaths(column, row - 1) + getPaths(column - 1, row);
 }
 
@@ -84,10 +87,16 @@ void task1RobotPaths()
 #define pyramidSize 5
 
 
-void setPyramid(float pyramid[][pyramidSize], int pyramidArraySize) {
+int setPyramid(float pyramid[][pyramidSize], int pyramidArraySize) {
     for (int y = pyramidArraySize - 1; y >= 0 ; y--)
-        for (int x = pyramidArraySize - 1; x >= y; x--)
+        for (int x = pyramidArraySize - 1; x >= y; x--) {
             scanf("%f", &pyramid[x][y]);
+            if (pyramid[x][y] < 0) {
+                printf("Negative weights are not supported.\n");
+                return fail;
+            }
+        }
+    return success;
 }
 
 float getPyramidWeight(float pyramid[][pyramidSize], int pyramidArraySize, int x, int y) {
@@ -115,7 +124,8 @@ void task2HumanPyramid()
 {
     float pyramid[pyramidSize][pyramidSize];
     printf("Please enter the weights of the cheerleaders:\n");
-    setPyramid(pyramid, pyramidSize);
+    if (setPyramid(pyramid, pyramidSize) == fail)
+        return;
     printPyramid(pyramid, pyramidSize);
 }
 
@@ -141,20 +151,20 @@ void clearBuffer(void) {
 int validateParenthesis(char finishChar) {
     char currentChar;
     if (scanf("%c", &currentChar) <= 0)
-        return -1;
+        return fail;
     if (currentChar == finishChar)
-        return 0;
+        return success;
     if (currentChar == '(' || currentChar == '{' || currentChar == '[' || currentChar == '<') {
-        if (validateParenthesis(getMatchingCloseParenthesis(currentChar)) == 0)
+        if (validateParenthesis(getMatchingCloseParenthesis(currentChar)) == success)
             return validateParenthesis(finishChar);
-        return -1;
+        return fail;
     }
     if (currentChar == ')' || currentChar == '}' || currentChar == ']' || currentChar == '>') {
         clearBuffer();
-        return -1;
+        return fail;
     }
     if (currentChar == '\n') {
-        return -1;
+        return fail;
     }
     return validateParenthesis(finishChar);
 }
@@ -163,7 +173,7 @@ void task3ParenthesisValidator()
 {
     clearBuffer();
     printf("Please enter a term for validation:\n");
-    if (validateParenthesis('\n') == 0)
+    if (validateParenthesis('\n') == success)
         printf("The parentheses are balanced correctly.\n");
     else
         printf("The parentheses are not balanced correctly.\n");
@@ -203,39 +213,39 @@ int checkQueenPosition(char board[][maxBoardSize], char areas[][maxBoardSize], i
     // check row
     for (i = 0; i < boardSize; i++)
         if (i != row && board[i][column] == 'X')
-            return 0;
+            return fail;
 
     // check column
     for (i = 0; i < boardSize; i++)
         if (i != column && board[row][i] == 'X')
-            return 0;
+            return fail;
 
     // check adjacent
     for (i = row - 1; i <= row + 1; i++)
         for (j = column - 1; j <= column + 1; j++)
             if ((i != row || j != column) && board[i][j] == 'X')
-                return 0;
+                return fail;
 
     // check area
     for (i = 0; i < boardSize; i++)
         for (j = 0; j < boardSize; j++)
             if (areas[i][j] == areas[row][column] && board[i][j] == 'X')
-                return 0;
+                return fail;
 
-    return 1;
+    return success;
 }
 
 int placeQueens(char board[][maxBoardSize], char areas[][maxBoardSize], int boardSize, int row, int column) {
     if (row == boardSize)
-        return 1;
+        return success;
 
     if (column == boardSize)
-        return 0;
+        return fail;
 
     if (checkQueenPosition(board, areas, boardSize, row, column) == 1) {
         board[row][column] = 'X';
         if (placeQueens(board, areas, boardSize, row + 1, 0)) {
-            return 1;
+            return success;
         }
         board[row][column] = '*';
     }
@@ -299,8 +309,8 @@ void tempPrintDict(char dictionary[][maxWord], int dictionarySize) {
 
 int isValidSlotData(int Y, int X, int length, char orientation, int gridSize) {
     if (orientation == 'V' && Y + length > gridSize || orientation == 'H' && X + length > gridSize)
-        return 0;
-    return 1;
+        return fail;
+    return success;
 }
 
 void getSlotsData(int locations[][slotLocationSize], char orientations[], int arraySize, int gridSize) {
@@ -373,7 +383,17 @@ void printGrid(int gridSize, int slots[][slotLocationSize], char slotsOrientatio
             printf("| %c ", grid[column][row]);
         printf(" |\n");
     }
+}
 
+int embedWordInCrossword(char crossword[][maxWord], int slots[][slotLocationSize], char slotsOrientations[], int slotsNum, char dictionary[][maxWord], int dictionarySize, int slot) {
+    if (slot > slotsNum)
+        return success;
+}
+
+int solveCrossword(char crossword[][maxWord], int slots[][slotLocationSize], char slotsOrientations[], int slotsNum, char dictionary[][maxWord], int dictionarySize) {
+    if (embedWordInCrossword(crossword, slots, slotsOrientations, slotsNum, dictionary, dictionarySize, 0) == 1)
+        return success;
+    return fail;
 }
 
 void task5CrosswordGenerator()
@@ -395,5 +415,9 @@ void task5CrosswordGenerator()
     initCrossword(crossword, slots, slotsNum);
     tempPrintCrossword(crossword, slotsNum);
     printGrid(gridSize, slots, slotsOrientations, crossword, slotsNum);
+    if (solveCrossword(crossword, slots, slotsOrientations, slotsNum, dictionary, dictionarySize) == 1)
+        printGrid(gridSize, slots, slotsOrientations, crossword, slotsNum);
+    else
+        printf("This crossword cannot be solved.\n");
     // Todo
 }
